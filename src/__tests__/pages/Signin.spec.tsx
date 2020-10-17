@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, wait } from '@testing-library/react';
 import Signin from '../../pages/Sigin';
 
 const mockedHistoryPush = jest.fn();
@@ -13,8 +13,16 @@ jest.mock('react-router-dom', () => {
   };
 });
 
+jest.mock('../../hooks/Auth', () => {
+  return {
+    useAuth: () => ({
+      signIn: jest.fn(),
+    }),
+  };
+});
+
 describe('Signin Page', () => {
-  it('should be able to sign in', () => {
+  it('should be able to sign in', async () => {
     const { getByPlaceholderText, getByText } = render(<Signin />);
 
     const emailField = getByPlaceholderText('E-mail');
@@ -26,6 +34,8 @@ describe('Signin Page', () => {
 
     fireEvent.click(buttonElement);
 
-    expect(mockedHistoryPush).toHaveBeenCalledWith('/dashboard');
+    await wait(() => {
+      expect(mockedHistoryPush).toHaveBeenCalledWith('/dashboard');
+    });
   });
 });
